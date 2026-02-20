@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC
+.dvc/
+.dvc/cache
+
+# Data
+data/raw/*.csv
+data/raw/*.zip
+data/processed/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Models
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+!models/.gitkeep
+
+# Logs
+logs/*.log
+logs/*.csv
+!logs/.gitkeep
+
+# Reports
+reports/*.txt
+reports/*.pdf
+reports/figures/*.png
+reports/figures/*.jpg
+reports/metrics/*.json
+!reports/.gitkeep
+!reports/figures/.gitkeep
+!reports/metrics/.gitkeep
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp

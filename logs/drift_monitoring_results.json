@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-02-02T00:32:08.327875",
+  "data_drift": {
+    "drift_score": 9.926465238002038,
+    "threshold": 0.3,
+    "detected": true
+  },
+  "prediction_drift": {}
+}

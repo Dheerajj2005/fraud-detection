@@ -1,0 +1,79 @@
+[
+  {
+    "timestamp": "2026-01-28T19:41:24.116118",
+    "alert_type": "data_drift",
+    "severity": "WARNING",
+    "message": "Data drift detected (score=9.9265)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-01-28T19:43:42.259860",
+    "alert_type": "data_drift",
+    "severity": "WARNING",
+    "message": "Data drift detected (score=9.9265)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-01T18:51:30.598088",
+    "alert_type": "data_drift",
+    "severity": "WARNING",
+    "message": "Data drift detected (score=9.9265)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-01T18:53:19.335458",
+    "alert_type": "data_drift",
+    "severity": "WARNING",
+    "message": "Data drift detected (score=9.9265)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-01T19:02:21.799830",
+    "alert_type": "data_drift",
+    "severity": "WARNING",
+    "message": "Data drift detected (score=9.9265)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:57.574392",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:57.788051",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:58.002286",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:58.219352",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:58.399616",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  },
+  {
+    "timestamp": "2026-02-02T12:18:58.621770",
+    "alert_type": "api_error_rate",
+    "severity": "ERROR",
+    "message": "High API error rate detected (50.00%)",
+    "metadata": {}
+  }
+]
