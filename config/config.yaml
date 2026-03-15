@@ -60,7 +60,7 @@ api:
 monitoring:
   log_predictions: true
   prediction_log_path: "logs/predictions.csv"
-  
+
 streamlit:
   title: "Fraud Detection System"
   page_icon: "🔍"

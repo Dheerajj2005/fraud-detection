@@ -25,6 +25,7 @@ from src.train import train_model
 # Fixtures
 # ---------------------------------------------------------------------
 
+
 @pytest.fixture
 def workspace(tmp_path):
     (tmp_path / "data/raw").mkdir(parents=True)
@@ -103,6 +104,7 @@ def config(workspace):
 # End-to-end pipeline
 # ---------------------------------------------------------------------
 
+
 @patch("src.train.mlflow")
 def test_full_pipeline_runs(mock_mlflow, dataset, config):
     mock_mlflow.start_run.return_value.__enter__ = Mock()
@@ -150,6 +152,7 @@ def test_full_pipeline_runs(mock_mlflow, dataset, config):
 # Persistence
 # ---------------------------------------------------------------------
 
+
 @patch("src.train.mlflow")
 def test_model_and_scaler_reload(mock_mlflow, dataset, config):
     mock_mlflow.start_run.return_value.__enter__ = Mock()
@@ -187,6 +190,7 @@ def test_model_and_scaler_reload(mock_mlflow, dataset, config):
 # ---------------------------------------------------------------------
 # Consistency & safety
 # ---------------------------------------------------------------------
+
 
 def test_no_data_leakage(dataset, config):
     df = engineer_all_features(load_data(config), config)

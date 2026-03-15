@@ -15,6 +15,7 @@ import logging
 # Global test logging setup
 # -------------------------
 
+
 @pytest.fixture(autouse=True)
 def quiet_logging():
     """Reduce log noise during tests."""
@@ -24,6 +25,7 @@ def quiet_logging():
 # -------------------------
 # Temporary workspace
 # -------------------------
+
 
 @pytest.fixture
 def temp_dir():
@@ -37,39 +39,34 @@ def temp_dir():
 # Sample configuration
 # -------------------------
 
+
 @pytest.fixture
 def test_config(temp_dir):
     """Minimal config used across tests."""
     return {
-        'data': {
-            'raw_path': str(temp_dir / 'data.csv'),
-            'processed_path': str(temp_dir) + '/',
-            'train_split': 0.7,
-            'val_split': 0.15,
-            'test_split': 0.15
+        "data": {
+            "raw_path": str(temp_dir / "data.csv"),
+            "processed_path": str(temp_dir) + "/",
+            "train_split": 0.7,
+            "val_split": 0.15,
+            "test_split": 0.15,
         },
-        'features': {
-            'numerical': ['Amount', 'Time'],
-            'pca_features': [f'V{i}' for i in range(1, 29)],
-            'target': 'Class',
-            'engineered': ['hour_of_day', 'amount_log', 'amount_scaled']
+        "features": {
+            "numerical": ["Amount", "Time"],
+            "pca_features": [f"V{i}" for i in range(1, 29)],
+            "target": "Class",
+            "engineered": ["hour_of_day", "amount_log", "amount_scaled"],
         },
-        'project': {
-            'random_state': 42
-        },
-        'training': {
-            'use_smote': False,
-            'smote_ratio': 0.3
-        },
-        'api': {
-            'threshold': 0.5
-        }
+        "project": {"random_state": 42},
+        "training": {"use_smote": False, "smote_ratio": 0.3},
+        "api": {"threshold": 0.5},
     }
 
 
 # -------------------------
 # Sample datasets
 # -------------------------
+
 
 @pytest.fixture
 def sample_dataframe():
@@ -78,13 +75,13 @@ def sample_dataframe():
     n = 500
 
     data = {
-        'Time': np.random.randint(0, 172800, n),
-        'Amount': np.random.lognormal(mean=4, sigma=2, size=n),
-        'Class': np.random.choice([0, 1], size=n, p=[0.99, 0.01]),
+        "Time": np.random.randint(0, 172800, n),
+        "Amount": np.random.lognormal(mean=4, sigma=2, size=n),
+        "Class": np.random.choice([0, 1], size=n, p=[0.99, 0.01]),
     }
 
     for i in range(1, 29):
-        data[f'V{i}'] = np.random.randn(n)
+        data[f"V{i}"] = np.random.randn(n)
 
     return pd.DataFrame(data)
 
@@ -92,7 +89,7 @@ def sample_dataframe():
 @pytest.fixture
 def saved_csv(sample_dataframe, test_config):
     """Save dataset to disk and return path."""
-    path = Path(test_config['data']['raw_path'])
+    path = Path(test_config["data"]["raw_path"])
     sample_dataframe.to_csv(path, index=False)
     return path
 
@@ -101,15 +98,13 @@ def saved_csv(sample_dataframe, test_config):
 # API transactions
 # -------------------------
 
+
 @pytest.fixture
 def sample_transaction():
     """Valid single transaction."""
-    tx = {
-        'Time': 12345.0,
-        'Amount': 120.5
-    }
+    tx = {"Time": 12345.0, "Amount": 120.5}
     for i in range(1, 29):
-        tx[f'V{i}'] = float(i) * 0.01
+        tx[f"V{i}"] = float(i) * 0.01
     return tx
 
 
@@ -117,13 +112,14 @@ def sample_transaction():
 def fraud_transaction(sample_transaction):
     """High-risk transaction."""
     tx = sample_transaction.copy()
-    tx['Amount'] = 5000.0
+    tx["Amount"] = 5000.0
     return tx
 
 
 # -------------------------
 # Mock MLflow
 # -------------------------
+
 
 @pytest.fixture
 def mock_mlflow():

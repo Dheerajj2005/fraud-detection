@@ -1,7 +1,3 @@
-"""
-FastAPI application for fraud detection.
-"""
-
 import time
 from datetime import datetime
 from pathlib import Path
@@ -30,7 +26,7 @@ from monitoring.prometheus_metrics import (
     record_latency,
     record_error,
     update_fraud_rate,
-    update_uptime
+    update_uptime,
 )
 
 
@@ -38,10 +34,7 @@ from api.model_loader import ModelLoader
 from src.utils import load_config, setup_logging, get_logger
 from monitoring.alerting import AlertManager
 
-# ------------------------------------------------------------------
 # Setup
-# ------------------------------------------------------------------
-
 setup_logging(log_level="INFO", log_file="logs/api.log")
 logger = get_logger(__name__)
 
@@ -63,13 +56,11 @@ app.add_middleware(
 # Metrics (Prometheus)
 # ------------------------------------------------------------------
 
-# ------------------------------------------------------------------
 # API Health Monitoring (NEW)
-# ------------------------------------------------------------------
-
 REQUEST_LATENCIES = deque(maxlen=100)
 REQUEST_ERRORS = deque(maxlen=100)
 alert_manager = AlertManager()
+
 
 def check_api_health_alerts():
     if len(REQUEST_LATENCIES) < 10:
@@ -77,38 +68,33 @@ def check_api_health_alerts():
 
     avg_latency = sum(REQUEST_LATENCIES) / len(REQUEST_LATENCIES)
     if len(REQUEST_ERRORS) == 0:
-     return
+        return
     error_rate = sum(REQUEST_ERRORS) / len(REQUEST_ERRORS) * 100
-
 
     if avg_latency > 200:
         alert_manager.send_alert(
             alert_type="api_latency",
             severity="WARNING",
-            message=f"High API latency detected (avg={avg_latency:.2f}ms)"
+            message=f"High API latency detected (avg={avg_latency:.2f}ms)",
         )
 
     if error_rate > 1.0:
         alert_manager.send_alert(
             alert_type="api_error_rate",
             severity="ERROR",
-            message=f"High API error rate detected ({error_rate:.2f}%)"
+            message=f"High API error rate detected ({error_rate:.2f}%)",
         )
 
-# ------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------
 
+# Globals
 model_loader: Optional[ModelLoader] = None
 config = None
 start_time = time.time()
 
 PREDICTION_LOG_PATH = Path("logs/predictions.csv")
 
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
 
+# Helpers
 def _ensure_model_loaded():
     if model_loader is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
@@ -132,10 +118,8 @@ def log_prediction(amount, fraud_probability, is_fraud, risk_level, latency_ms):
     else:
         df.to_csv(PREDICTION_LOG_PATH, index=False)
 
-# ------------------------------------------------------------------
-# Lifecycle
-# ------------------------------------------------------------------
 
+# Lifecycle
 @app.on_event("startup")
 async def startup_event():
     global model_loader, config
@@ -154,10 +138,8 @@ async def startup_event():
 async def shutdown_event():
     logger.info("Shutting down API")
 
-# ------------------------------------------------------------------
-# Middleware
-# ------------------------------------------------------------------
 
+# Middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start = time.time()
@@ -173,10 +155,8 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
-# ------------------------------------------------------------------
-# Routes
-# ------------------------------------------------------------------
 
+# Routes
 @app.get("/")
 async def root():
     return {"message": "Fraud Detection API", "docs": "/docs", "health": "/health"}
@@ -191,8 +171,8 @@ async def health():
         version="1.0.0",
     )
 
-# ------------------ SINGLE PREDICTION ------------------
 
+#  SINGLE PREDICTION
 @app.post("/predict", response_model=PredictionOutput)
 async def predict(transaction: TransactionInput):
     _ensure_model_loaded()
@@ -205,15 +185,14 @@ async def predict(transaction: TransactionInput):
 
         REQUEST_ERRORS.append(0)
         record_prediction(
-        is_fraud=result["is_fraud"],
-        probability=result["fraud_probability"],
-        risk_level=result["risk_level"],
-        endpoint="predict",
+            is_fraud=result["is_fraud"],
+            probability=result["fraud_probability"],
+            risk_level=result["risk_level"],
+            endpoint="predict",
         )
 
         record_latency(latency_ms / 1000)
 
-        
         log_prediction(
             amount=tx["Amount"],
             fraud_probability=result["fraud_probability"],
@@ -221,8 +200,6 @@ async def predict(transaction: TransactionInput):
             risk_level=result["risk_level"],
             latency_ms=latency_ms,
         )
-
-
 
         return PredictionOutput(
             is_fraud=result["is_fraud"],
@@ -234,14 +211,14 @@ async def predict(transaction: TransactionInput):
         )
 
     except Exception as e:
-      REQUEST_ERRORS.append(1)
-      #api_errors.inc()
-      record_error()   # ← FIXED
-      logger.error(f"Prediction failed: {e}", exc_info=True)
-      raise HTTPException(status_code=500, detail="Prediction failed")
+        REQUEST_ERRORS.append(1)
+        # api_errors.inc()
+        record_error()  # ← FIXED
+        logger.error(f"Prediction failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Prediction failed")
 
-# ------------------ BATCH PREDICTION ------------------
 
+# BATCH PREDICTION
 @app.post("/predict_batch", response_model=BatchPredictionOutput)
 async def predict_batch(batch: BatchPredictionInput):
     _ensure_model_loaded()
@@ -256,12 +233,11 @@ async def predict_batch(batch: BatchPredictionInput):
 
         for tx, r in zip(transactions, results):
             record_prediction(
-            is_fraud=r["is_fraud"],
-            probability=r["fraud_probability"],
-            risk_level=r["risk_level"],
-            endpoint="predict_batch",
+                is_fraud=r["is_fraud"],
+                probability=r["fraud_probability"],
+                risk_level=r["risk_level"],
+                endpoint="predict_batch",
             )
-
 
             log_prediction(
                 amount=tx["Amount"],
@@ -293,20 +269,43 @@ async def predict_batch(batch: BatchPredictionInput):
 
     except Exception as e:
         REQUEST_ERRORS.append(1)
-        #api_errors.inc()
-        record_error()   # ← FIXED
+        # api_errors.inc()
+        record_error()  # ← FIXED
         logger.error(f"Batch prediction failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Batch prediction failed")
-# ------------------ METRICS ------------------
 
+
+# METRICS
 @app.get("/metrics", response_model=MetricsResponse)
 async def metrics():
-    if not PREDICTION_LOG_PATH.exists():
-        return MetricsResponse(0, 0, 0.0, 0.0, 0.0)
+    if not PREDICTION_LOG_PATH.exists() or PREDICTION_LOG_PATH.stat().st_size == 0:
+        return MetricsResponse(
+            total_predictions=0,
+            fraud_detected=0,
+            fraud_rate=0.0,
+            average_latency_ms=0.0,
+            requests_per_minute=0.0,
+        )
 
-    df = pd.read_csv(PREDICTION_LOG_PATH)
+    try:
+        df = pd.read_csv(PREDICTION_LOG_PATH)
+    except pd.errors.EmptyDataError:
+        return MetricsResponse(
+            total_predictions=0,
+            fraud_detected=0,
+            fraud_rate=0.0,
+            average_latency_ms=0.0,
+            requests_per_minute=0.0,
+        )
+
     if df.empty:
-        return MetricsResponse(0, 0, 0.0, 0.0, 0.0)
+        return MetricsResponse(
+            total_predictions=0,
+            fraud_detected=0,
+            fraud_rate=0.0,
+            average_latency_ms=0.0,
+            requests_per_minute=0.0,
+        )
 
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     last_hour = df[df["timestamp"] > datetime.now() - pd.Timedelta(hours=1)]
@@ -317,7 +316,6 @@ async def metrics():
     update_fraud_rate(frauds / total)
     update_uptime(time.time() - start_time)
 
-
     return MetricsResponse(
         total_predictions=total,
         fraud_detected=frauds,
@@ -326,14 +324,13 @@ async def metrics():
         requests_per_minute=round(len(last_hour) / 60, 2),
     )
 
+
 @app.get("/prometheus-metrics")
 async def prometheus_metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-# ------------------------------------------------------------------
-# Local run
-# ------------------------------------------------------------------
 
+# Local run
 if __name__ == "__main__":
     uvicorn.run(
         "api.main:app",

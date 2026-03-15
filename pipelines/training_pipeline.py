@@ -1,8 +1,3 @@
-"""
-Automated Training Pipeline with Prefect
-File: pipelines/training_pipeline.py
-"""
-
 import sys
 from pathlib import Path
 from typing import Dict
@@ -21,7 +16,10 @@ sys.path.append(str(PROJECT_ROOT))
 
 from src.utils import load_config, setup_logging, get_logger
 from src.data_preprocessing import (
-    load_data, split_data, scale_features, handle_imbalance
+    load_data,
+    split_data,
+    scale_features,
+    handle_imbalance,
 )
 from src.feature_engineering import engineer_all_features
 from src.train import train_model
@@ -32,8 +30,8 @@ from monitoring.alerting import AlertManager
 setup_logging()
 logger = get_logger(__name__)
 
-# ------------------- Tasks -------------------
 
+# Tasks
 @task
 def preprocess_data(config: Dict):
     df = load_data(config)
@@ -90,14 +88,14 @@ def evaluate_task(model, scaler, X_test, y_test, config):
     )
 
 
-# ------------------- Flow -------------------
+# Flow
+
 
 @flow(
     name="fraud_detection_training_pipeline",
     task_runner=SequentialTaskRunner(),
 )
 def training_pipeline(force_retrain: bool = False, skip_drift_check: bool = False):
-
     config = load_config("config/config.yaml")
     pipeline_cfg = load_config("pipelines/pipeline_config.yaml")
     alert = AlertManager(config)
@@ -134,10 +132,8 @@ def training_pipeline(force_retrain: bool = False, skip_drift_check: bool = Fals
         test_metrics = evaluate_task(model, scaler, X_test, y_test, config)
 
         if (
-            test_metrics["f1_score"]
-            >= pipeline_cfg["triggers"]["min_f1_score"]
-            and test_metrics["recall"]
-            >= pipeline_cfg["triggers"]["min_recall"]
+            test_metrics["f1_score"] >= pipeline_cfg["triggers"]["min_f1_score"]
+            and test_metrics["recall"] >= pipeline_cfg["triggers"]["min_recall"]
         ):
             alert.send_alert(
                 "model_registered",
@@ -168,9 +164,7 @@ def training_pipeline(force_retrain: bool = False, skip_drift_check: bool = Fals
         raise
 
     finally:
-        results["duration_seconds"] = (
-            datetime.now() - start_time
-        ).total_seconds()
+        results["duration_seconds"] = (datetime.now() - start_time).total_seconds()
 
         Path("logs").mkdir(exist_ok=True)
         with open("logs/pipeline_results.json", "w") as f:
@@ -179,7 +173,8 @@ def training_pipeline(force_retrain: bool = False, skip_drift_check: bool = Fals
     return results
 
 
-# ------------------- Deployment -------------------
+# Deployment
+
 
 def create_deployment():
     Deployment.build_from_flow(

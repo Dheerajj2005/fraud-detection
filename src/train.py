@@ -1,13 +1,3 @@
-"""
-Model training module for fraud detection system.
-
-Handles:
-- Model training
-- Evaluation
-- MLflow logging
-- Artifact saving
-"""
-
 import time
 from pathlib import Path
 from typing import Dict, Any, Tuple
@@ -46,10 +36,7 @@ from src.feature_engineering import engineer_all_features
 logger = get_logger(__name__)
 
 
-# ------------------------------------------------------------------
 # Metrics
-# ------------------------------------------------------------------
-
 def calculate_metrics(
     y_true: np.ndarray,
     y_pred: np.ndarray,
@@ -79,10 +66,7 @@ def _log_metrics(metrics: Dict[str, float]) -> None:
         logger.info(f"{k}: {v:.4f}")
 
 
-# ------------------------------------------------------------------
 # Training
-# ------------------------------------------------------------------
-
 def train_model(
     X_train: pd.DataFrame,
     y_train: pd.Series,
@@ -124,9 +108,7 @@ def train_model(
             ],
         )
 
-        mlflow.log_metric(
-            "training_time_seconds", time.time() - start_time
-        )
+        mlflow.log_metric("training_time_seconds", time.time() - start_time)
 
         y_proba = model.predict(X_val)
         y_pred = (y_proba >= config["api"]["threshold"]).astype(int)
@@ -147,9 +129,7 @@ def train_model(
         mlflow.log_artifact(str(cm_path))
 
         fi_path = fig_dir / "feature_importance.png"
-        plot_feature_importance(
-            model, X_train.columns.tolist(), str(fi_path)
-        )
+        plot_feature_importance(model, X_train.columns.tolist(), str(fi_path))
         mlflow.log_artifact(str(fi_path))
 
         report = classification_report(
@@ -174,10 +154,7 @@ def train_model(
         return model, metrics
 
 
-# ------------------------------------------------------------------
 # Pipeline
-# ------------------------------------------------------------------
-
 def main():
     from src.utils import load_config, setup_logging
 
@@ -207,9 +184,7 @@ def main():
 
     X_train, y_train = handle_imbalance(X_train, y_train, config)
 
-    model, metrics = train_model(
-        X_train, y_train, X_val, y_val, config
-    )
+    model, metrics = train_model(X_train, y_train, X_val, y_val, config)
 
     logger.info("Training complete")
     return model, metrics

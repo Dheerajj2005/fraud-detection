@@ -1,34 +1,22 @@
-"""
-Pydantic schemas for API request/response validation.
-"""
 from __future__ import annotations
-from datetime import datetime
 from typing import List, Optional
-
-
 from pydantic import BaseModel, Field, create_model
 
 
-# ------------------------------------------------------------------
 # Helpers (very limited, internal)
-# ------------------------------------------------------------------
-
 def _pca_fields():
     return {
         f"V{i}": (
             Optional[float],
             Field(
-                default=0.0,
-                description=f"PCA component V{i} (optional, default=0.0)"
+                default=0.0, description=f"PCA component V{i} (optional, default=0.0)"
             ),
         )
         for i in range(1, 29)
     }
 
-# ------------------------------------------------------------------
-# Input Schemas
-# ------------------------------------------------------------------
 
+# Input Schemas
 TransactionInput = create_model(
     "TransactionInput",
     Time=(float, Field(..., ge=0, description="Seconds since first transaction")),
@@ -57,6 +45,7 @@ TransactionInput.__config__ = type(
 
 class BatchPredictionInput(BaseModel):
     """Schema for batch prediction input."""
+
     transactions: List["TransactionInput"]
 
     class Config:
@@ -73,10 +62,7 @@ class BatchPredictionInput(BaseModel):
         }
 
 
-# ------------------------------------------------------------------
 # Output Schemas
-# ------------------------------------------------------------------
-
 class PredictionOutput(BaseModel):
     """Schema for prediction output."""
 

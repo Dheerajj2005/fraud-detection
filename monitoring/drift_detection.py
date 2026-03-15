@@ -1,8 +1,3 @@
-"""
-Lightweight Drift Monitoring Job with HTML Reporting
-File: monitoring/drift_detection.py
-"""
-
 from pathlib import Path
 from datetime import datetime
 import json
@@ -18,9 +13,8 @@ from monitoring.alerting import AlertManager
 
 logger = get_logger(__name__)
 
-# ------------------------------------------------------------------
+
 # Helper: JSON Serializer for NumPy types
-# ------------------------------------------------------------------
 def json_converter(obj):
     if isinstance(obj, (np.bool_, bool)):
         return bool(obj)
@@ -30,9 +24,8 @@ def json_converter(obj):
         return float(obj)
     return str(obj)
 
-# ------------------------------------------------------------------
+
 # Helper: Prediction Drift
-# ------------------------------------------------------------------
 def check_prediction_drift(
     prediction_log_path: str,
     window_days: int,
@@ -57,9 +50,8 @@ def check_prediction_drift(
         "detected": drift_detected,
     }
 
-# ------------------------------------------------------------------
+
 # Main Job
-# ------------------------------------------------------------------
 def drift_monitoring_job(
     config_path: str = "monitoring/drift_config.yaml",
     prediction_log_path: str = "logs/predictions.csv",
@@ -99,10 +91,10 @@ def drift_monitoring_job(
         logger.info("Generating Evidently HTML Report...")
         report = Report(metrics=[DataDriftPreset()])
         report.run(reference_data=ref, current_data=curr)
-        
+
         report_dir = Path("reports/drift")
         report_dir.mkdir(parents=True, exist_ok=True)
-        
+
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_path = report_dir / f"data_drift_report_{timestamp_str}.html"
         report.save_html(str(report_path))
@@ -127,7 +119,11 @@ def drift_monitoring_job(
         )
         results["prediction_drift"] = info
         if detected:
-            alert.send_alert(alert_type="prediction_drift", severity="WARNING", message="Prediction drift detected")
+            alert.send_alert(
+                alert_type="prediction_drift",
+                severity="WARNING",
+                message="Prediction drift detected",
+            )
 
     # Save JSON results
     Path("logs").mkdir(exist_ok=True)
@@ -136,6 +132,7 @@ def drift_monitoring_job(
 
     logger.info("DRIFT MONITORING JOB COMPLETED")
     return results
+
 
 if __name__ == "__main__":
     output = drift_monitoring_job()

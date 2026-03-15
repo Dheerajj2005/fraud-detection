@@ -18,6 +18,7 @@ import pandas as pd
 # Fixtures
 # ------------------------------------------------------------------
 
+
 @pytest.fixture
 def mock_model():
     model = Mock()
@@ -51,9 +52,11 @@ def client(tmp_path, mock_model):
 
     with patch("api.main.load_config", return_value=config):
         with patch("api.main.ModelLoader", return_value=mock_model):
-            with patch("api.main.prediction_log_path", str(log_path)):
+            with patch("api.main.PREDICTION_LOG_PATH", log_path):
                 from api.main import app
-                yield TestClient(app)
+
+                with TestClient(app) as c:
+                    yield c
 
 
 @pytest.fixture
@@ -68,6 +71,7 @@ def txn():
 # ------------------------------------------------------------------
 # Root & health
 # ------------------------------------------------------------------
+
 
 def test_root(client):
     r = client.get("/")
@@ -85,6 +89,7 @@ def test_health(client):
 # ------------------------------------------------------------------
 # Single prediction
 # ------------------------------------------------------------------
+
 
 def test_predict_ok(client, txn):
     r = client.post("/predict", json=txn)
@@ -110,6 +115,7 @@ def test_predict_validation_error(client):
 # Batch prediction
 # ------------------------------------------------------------------
 
+
 def test_batch_predict(client, txn):
     batch = {"transactions": [txn, txn]}
     r = client.post("/predict_batch", json=batch)
@@ -129,6 +135,7 @@ def test_batch_empty(client):
 # Metrics
 # ------------------------------------------------------------------
 
+
 def test_metrics(client):
     r = client.get("/metrics")
     data = r.json()
@@ -141,6 +148,7 @@ def test_metrics(client):
 # ------------------------------------------------------------------
 # Errors
 # ------------------------------------------------------------------
+
 
 def test_404(client):
     r = client.get("/does-not-exist")

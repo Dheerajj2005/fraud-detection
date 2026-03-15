@@ -1,9 +1,3 @@
-"""
-Feature engineering module for fraud detection system.
-
-Creates additional features from raw transaction data.
-"""
-
 import numpy as np
 import pandas as pd
 from typing import Dict, Any
@@ -13,10 +7,7 @@ from src.utils import get_logger
 logger = get_logger(__name__)
 
 
-# ------------------------------------------------------------------
 # Feature creation
-# ------------------------------------------------------------------
-
 def create_time_features(df: pd.DataFrame) -> pd.DataFrame:
     """Create hour-of-day feature from Time column."""
     if "Time" not in df.columns:
@@ -64,10 +55,7 @@ def create_interaction_features(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# ------------------------------------------------------------------
 # Validation
-# ------------------------------------------------------------------
-
 def validate_features(df: pd.DataFrame, config: Dict[str, Any]) -> bool:
     """
     Basic feature validation:
@@ -92,10 +80,7 @@ def validate_features(df: pd.DataFrame, config: Dict[str, Any]) -> bool:
     return True
 
 
-# ------------------------------------------------------------------
 # Pipeline orchestration
-# ------------------------------------------------------------------
-
 def engineer_all_features(
     df: pd.DataFrame,
     config: Dict[str, Any],
@@ -121,10 +106,7 @@ def engineer_all_features(
     return df
 
 
-# ------------------------------------------------------------------
 # Feature list helper
-# ------------------------------------------------------------------
-
 def get_feature_names(
     config: Dict[str, Any],
     include_engineered: bool = True,

@@ -25,6 +25,7 @@ from src.feature_engineering import (
 # Fixtures
 # ------------------------------------------------------------------
 
+
 @pytest.fixture
 def config():
     return {
@@ -39,18 +40,21 @@ def config():
 
 @pytest.fixture
 def df():
-    return pd.DataFrame({
-        "Time": [0, 3600, 7200, 90000],
-        "Amount": [0, 10, 100, 200],
-        "V1": [0.1, -0.2, 0.3, 0.0],
-        "V2": [0.0, 0.1, -0.1, 0.2],
-        "Class": [0, 0, 0, 1],
-    })
+    return pd.DataFrame(
+        {
+            "Time": [0, 3600, 7200, 90000],
+            "Amount": [0, 10, 100, 200],
+            "V1": [0.1, -0.2, 0.3, 0.0],
+            "V2": [0.0, 0.1, -0.1, 0.2],
+            "Class": [0, 0, 0, 1],
+        }
+    )
 
 
 # ------------------------------------------------------------------
 # Time features
 # ------------------------------------------------------------------
+
 
 def test_time_hour_range(df):
     out = create_time_features(df)
@@ -65,6 +69,7 @@ def test_time_missing_col():
 # ------------------------------------------------------------------
 # Amount features
 # ------------------------------------------------------------------
+
 
 def test_amount_features_created(df):
     out = create_amount_features(df)
@@ -88,6 +93,7 @@ def test_amount_negative_handled():
 # Interaction features
 # ------------------------------------------------------------------
 
+
 def test_interaction_created(df):
     out = create_time_features(df)
     out = create_amount_features(out)
@@ -104,6 +110,7 @@ def test_interaction_skipped_if_missing(df):
 # Validation
 # ------------------------------------------------------------------
 
+
 def test_validate_ok(df, config):
     out = engineer_all_features(df, config, validate=False)
     assert validate_features(out, config) is True
@@ -118,6 +125,7 @@ def test_validate_fails_nan(df, config):
 # ------------------------------------------------------------------
 # Pipeline
 # ------------------------------------------------------------------
+
 
 def test_engineer_all_adds_features(df, config):
     out = engineer_all_features(df, config)
@@ -139,6 +147,7 @@ def test_engineer_validation_raises(config):
 # ------------------------------------------------------------------
 # Feature names
 # ------------------------------------------------------------------
+
 
 def test_feature_names_all(config):
     names = get_feature_names(config)

@@ -1,10 +1,3 @@
-"""
-Model loader for handling model inference.
-Compatible with:
-- LightGBM Booster
-- StandardScaler trained on [Time, Amount, amount_scaled]
-"""
-
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -35,10 +28,7 @@ class ModelLoader:
         # Feature order EXPECTED by scaler
         self.scaler_features = ["Time", "Amount", "amount_scaled"]
 
-    # ------------------------------------------------------------------
     # Feature Engineering
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -50,35 +40,23 @@ class ModelLoader:
 
         return df
 
-    # ------------------------------------------------------------------
     # Preprocessing
-    # ------------------------------------------------------------------
-
     def _prepare_dataframe(self, transactions: List[Dict[str, float]]) -> pd.DataFrame:
         df = pd.DataFrame(transactions)
 
-        # Feature engineering
         df = self._engineer_features(df)
 
-        # Get exact feature order used during scaler training
         scaler_order = list(self.scaler.feature_names_in_)
 
-        # Reorder columns exactly
         scaled_values = self.scaler.transform(df[scaler_order])
 
-        # Put scaled values back
         df[scaler_order] = scaled_values
 
-
-        # ✅ Ensure correct column order for model
         df = df[self.model_features]
 
         return df
 
-    # ------------------------------------------------------------------
     # Prediction
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _risk_level(prob: float) -> str:
         if prob < 0.3:
@@ -99,7 +77,9 @@ class ModelLoader:
             "risk_level": self._risk_level(prob),
         }
 
-    def predict_batch(self, transactions: List[Dict[str, float]]) -> List[Dict[str, Any]]:
+    def predict_batch(
+        self, transactions: List[Dict[str, float]]
+    ) -> List[Dict[str, Any]]:
         df = self._prepare_dataframe(transactions)
         probs = self.model.predict(df)
 

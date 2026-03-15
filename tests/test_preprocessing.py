@@ -9,7 +9,6 @@ Focus:
 
 import pytest
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import tempfile
 
@@ -26,6 +25,7 @@ from src.data_preprocessing import (
 # ------------------------------------------------------------------
 # Fixtures (small, deterministic)
 # ------------------------------------------------------------------
+
 
 @pytest.fixture
 def config():
@@ -53,13 +53,15 @@ def config():
 @pytest.fixture
 def dataframe():
     """Small deterministic dataset."""
-    return pd.DataFrame({
-        "Time": [10, 20, 30, 40, 50, 60],
-        "Amount": [100, 200, 150, 300, 250, 400],
-        "V1": [0.1, -0.2, 0.3, 0.1, -0.1, 0.2],
-        "V2": [0.0, 0.1, -0.1, 0.2, -0.2, 0.0],
-        "Class": [0, 0, 0, 0, 0, 1],
-    })
+    return pd.DataFrame(
+        {
+            "Time": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+            "Amount": [100, 200, 150, 300, 250, 400, 500, 350, 200, 150],
+            "V1": [0.1, -0.2, 0.3, 0.1, -0.1, 0.2, -0.3, 0.4, 0.1, 0.2],
+            "V2": [0.0, 0.1, -0.1, 0.2, -0.2, 0.0, 0.1, -0.2, 0.3, -0.1],
+            "Class": [0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+        }
+    )
 
 
 @pytest.fixture
@@ -71,6 +73,7 @@ def temp_dir():
 # ------------------------------------------------------------------
 # Tests
 # ------------------------------------------------------------------
+
 
 def test_load_data_success(dataframe, config, temp_dir):
     path = Path(temp_dir) / "data.csv"

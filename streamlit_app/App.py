@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
 from pathlib import Path
 import requests
 
@@ -11,18 +10,22 @@ st.set_page_config(
     page_title="Fraud Detection System",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # ---------------- CSS ---------------- #
-st.markdown("""
+st.markdown(
+    """
 <style>
 .main-header { font-size: 2.5rem; font-weight: bold; text-align: center; }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 API_URL = "http://localhost:8000"
 LOG_PATH = Path("logs/predictions.csv")
+
 
 # ---------------- HELPERS ---------------- #
 @st.cache_data(ttl=30)
@@ -34,18 +37,21 @@ def load_prediction_logs():
         return df
     return pd.DataFrame()
 
+
 def check_api_health():
     try:
         return requests.get(f"{API_URL}/health", timeout=2).status_code == 200
-    except:
+    except Exception:
         return False
+
 
 def get_api_metrics():
     try:
         r = requests.get(f"{API_URL}/metrics", timeout=2)
         return r.json() if r.status_code == 200 else None
-    except:
+    except Exception:
         return None
+
 
 def fallback_metrics(df: pd.DataFrame):
     if df.empty:
@@ -55,11 +61,14 @@ def fallback_metrics(df: pd.DataFrame):
         "fraud_detected": int(df["is_fraud"].sum()),
         "fraud_rate": float(df["is_fraud"].mean()),
         "average_latency_ms": float(df["latency_ms"].mean()),
-        "requests_per_minute": 0.0
+        "requests_per_minute": 0.0,
     }
 
+
 # ---------------- HEADER ---------------- #
-st.markdown("<h1 class='main-header'>🔍 Fraud Detection System</h1>", unsafe_allow_html=True)
+st.markdown(
+    "<h1 class='main-header'>🔍 Fraud Detection System</h1>", unsafe_allow_html=True
+)
 st.markdown("**Real-time credit card fraud detection dashboard**")
 
 # ---------------- STATUS ---------------- #
@@ -104,11 +113,13 @@ if not df.empty:
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### 🎯 Fraud Distribution")
-    pie = go.Figure(go.Pie(
-        labels=["Legitimate", "Fraud"],
-        values=[(df["is_fraud"] == False).sum(), df["is_fraud"].sum()],
-        hole=0.4
-    ))
+    pie = go.Figure(
+        go.Pie(
+            labels=["Legitimate", "Fraud"],
+            values=[(~df["is_fraud"]).sum(), df["is_fraud"].sum()],
+            hole=0.4,
+        )
+    )
     st.plotly_chart(pie, use_container_width=True)
 
     st.markdown("### 🚦 Risk Levels")
@@ -117,10 +128,16 @@ if not df.empty:
     st.plotly_chart(bar, use_container_width=True)
 
     st.markdown("### 📋 Recent Predictions")
-    recent = df.tail(10)[[
-        "timestamp", "amount", "fraud_probability",
-        "is_fraud", "risk_level", "latency_ms"
-    ]]
+    recent = df.tail(10)[
+        [
+            "timestamp",
+            "amount",
+            "fraud_probability",
+            "is_fraud",
+            "risk_level",
+            "latency_ms",
+        ]
+    ]
     st.dataframe(recent, use_container_width=True)
 
 else:

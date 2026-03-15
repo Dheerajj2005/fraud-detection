@@ -3,52 +3,52 @@ pipeline:
   retries: 3
   retry_delay_seconds: 60
   timeout_seconds: 3600  # 1 hour
-  
+
 triggers:
   # Drift detection
   data_drift_threshold: 0.3  # Trigger retraining if drift score > 0.3
-  
+
   # Model performance thresholds for registration
   min_f1_score: 0.90
   min_recall: 0.92
   min_precision: 0.85
   min_roc_auc: 0.95
-  
+
   # Performance degradation
   max_performance_drop_pct: 10  # Trigger if metrics drop > 10%
-  
+
 alerts:
   # Email configuration
   email: true
   email_recipients:
     - "ml-team@company.com"
     - "admin@company.com"
-  
+
   # Slack (disabled by default)
   slack: false
   slack_webhook_url: ""
-  
+
   # Alert frequency limits
   rate_limiting:
     max_alerts_per_hour: 5
     cooldown_minutes: 30
-  
+
 reference_data:
   path: "data/processed/train_reference.csv"
   update_frequency_days: 7  # Update reference data weekly
-  
+
 mlflow:
   experiment_name: "fraud_detection_pipeline"
   tracking_uri: "mlruns"
   auto_log: true
   log_models: true
-  
+
 monitoring:
   enable_drift_detection: true
   drift_check_frequency_hours: 24
   save_drift_reports: true
   drift_reports_path: "reports/drift/"
-  
+
 logging:
   level: "INFO"
   log_file: "logs/pipeline.log"

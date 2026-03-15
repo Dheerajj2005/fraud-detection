@@ -1,7 +1,3 @@
-"""
-Model evaluation module for fraud detection system.
-"""
-
 import json
 from pathlib import Path
 from typing import Dict, Any
@@ -28,10 +24,7 @@ from src.utils import (
 logger = get_logger(__name__)
 
 
-# ------------------------------------------------------------------
 # Evaluation
-# ------------------------------------------------------------------
-
 def evaluate_model(
     model_path: str,
     scaler_path: str,
@@ -45,29 +38,21 @@ def evaluate_model(
     model = joblib.load(model_path)
     scaler = joblib.load(scaler_path)
 
-    # -------------------------------
     # Scaling
-    # -------------------------------
     numerical_features = ["Amount", "Time", "amount_scaled"]
     X_test = X_test.copy()
     X_test[numerical_features] = scaler.transform(X_test[numerical_features])
 
-    # -------------------------------
     # Predictions
-    # -------------------------------
     y_proba = model.predict(X_test)
     threshold = config["api"]["threshold"]
     y_pred = (y_proba >= threshold).astype(int)
 
-    # -------------------------------
     # Confusion matrix
-    # -------------------------------
     cm = confusion_matrix(y_test, y_pred)
     tn, fp, fn, tp = cm.ravel()
 
-    # -------------------------------
     # Core metrics
-    # -------------------------------
     metrics: Dict[str, Any] = {
         "accuracy": (tp + tn) / (tp + tn + fp + fn),
         "precision": precision_score(y_test, y_pred, zero_division=0),
@@ -84,9 +69,7 @@ def evaluate_model(
         ),
     }
 
-    # -------------------------------
     # Threshold analysis
-    # -------------------------------
     thresholds = np.linspace(0.05, 0.95, 19)
     threshold_rows = []
 
@@ -97,12 +80,14 @@ def evaluate_model(
         preds = (y_proba >= t).astype(int)
         f1 = f1_score(y_test, preds, zero_division=0)
 
-        threshold_rows.append({
-            "threshold": float(t),
-            "precision": precision_score(y_test, preds, zero_division=0),
-            "recall": recall_score(y_test, preds, zero_division=0),
-            "f1_score": f1,
-        })
+        threshold_rows.append(
+            {
+                "threshold": float(t),
+                "precision": precision_score(y_test, preds, zero_division=0),
+                "recall": recall_score(y_test, preds, zero_division=0),
+                "f1_score": f1,
+            }
+        )
 
         if f1 > best_f1:
             best_f1 = f1
@@ -114,12 +99,10 @@ def evaluate_model(
         "all_thresholds": threshold_rows,
     }
 
-    # -------------------------------
     # Business impact analysis
-    # -------------------------------
-    TP_BENEFIT = 500.0     # money saved per fraud caught
-    FP_COST = 5.0          # cost of false alarm
-    FN_COST = 800.0        # cost of missed fraud
+    TP_BENEFIT = 500.0  # money saved per fraud caught
+    FP_COST = 5.0  # cost of false alarm
+    FN_COST = 800.0  # cost of missed fraud
 
     total_benefit = tp * TP_BENEFIT
     total_cost = (fp * FP_COST) + (fn * FN_COST)
@@ -135,9 +118,7 @@ def evaluate_model(
         "cost_per_transaction": total_cost / len(y_test) if len(y_test) else 0.0,
     }
 
-    # -------------------------------
     # Plots
-    # -------------------------------
     fig_dir = Path("reports/figures")
     fig_dir.mkdir(parents=True, exist_ok=True)
 
@@ -163,9 +144,7 @@ def evaluate_model(
         str(fig_dir / "test_roc_curve.png"),
     )
 
-    # -------------------------------
     # Save metrics
-    # -------------------------------
     metrics_dir = Path("reports/metrics")
     metrics_dir.mkdir(parents=True, exist_ok=True)
 
@@ -180,10 +159,7 @@ def evaluate_model(
     return metrics
 
 
-# ------------------------------------------------------------------
 # CLI
-# ------------------------------------------------------------------
-
 if __name__ == "__main__":
     from src.utils import load_config, setup_logging
     from src.data_preprocessing import prepare_features_and_target

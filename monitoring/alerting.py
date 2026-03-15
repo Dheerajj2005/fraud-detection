@@ -1,12 +1,3 @@
-"""
-Simple Alert Manager (Phase 2)
-File: monitoring/alerting.py
-
-Purpose:
-- Log important pipeline / monitoring alerts to JSON
-- Keep alerting simple and observable
-"""
-
 from pathlib import Path
 from typing import Dict, Optional
 from datetime import datetime
@@ -68,4 +59,3 @@ class AlertManager:
             logger.warning(message)
         else:
             logger.info(message)
-

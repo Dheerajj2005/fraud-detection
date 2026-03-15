@@ -16,6 +16,7 @@ from src.train import calculate_metrics, train_model
 # Fixtures
 # -------------------------------------------------------------------
 
+
 @pytest.fixture
 def config(tmp_path):
     return {
@@ -70,6 +71,7 @@ def data():
 # calculate_metrics
 # -------------------------------------------------------------------
 
+
 def test_calculate_metrics_basic():
     y_true = np.array([0, 0, 1, 1])
     y_pred = np.array([0, 1, 1, 1])
@@ -98,6 +100,7 @@ def test_calculate_metrics_basic():
 # -------------------------------------------------------------------
 # train_model
 # -------------------------------------------------------------------
+
 
 @patch("src.train.mlflow")
 @patch("src.train.plot_confusion_matrix")

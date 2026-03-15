@@ -1,14 +1,3 @@
-"""
-Data preprocessing module for fraud detection system.
-
-Handles:
-- Data loading
-- Missing value handling
-- Train/validation/test splitting
-- Feature scaling
-- Class imbalance handling (SMOTE)
-"""
-
 from pathlib import Path
 from typing import Tuple, Dict, Any, Optional
 
@@ -24,10 +13,7 @@ from src.utils import get_logger
 logger = get_logger(__name__)
 
 
-# ------------------------------------------------------------------
 # Data loading & cleaning
-# ------------------------------------------------------------------
-
 def load_data(config: Dict[str, Any]) -> pd.DataFrame:
     """Load and validate raw credit card transaction data."""
     data_path = Path(config["data"]["raw_path"])
@@ -68,10 +54,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# ------------------------------------------------------------------
 # Data splitting
-# ------------------------------------------------------------------
-
 def split_data(
     df: pd.DataFrame,
     config: Dict[str, Any],
@@ -85,9 +68,7 @@ def split_data(
     if not np.isclose(train_r + val_r + test_r, 1.0):
         raise ValueError("Train/val/test ratios must sum to 1.0")
 
-    logger.info(
-        f"Splitting data (train={train_r}, val={val_r}, test={test_r})"
-    )
+    logger.info(f"Splitting data (train={train_r}, val={val_r}, test={test_r})")
 
     train_val_df, test_df = train_test_split(
         df,
@@ -111,10 +92,7 @@ def split_data(
     return train_df, val_df, test_df
 
 
-# ------------------------------------------------------------------
 # Feature scaling
-# ------------------------------------------------------------------
-
 def scale_features(
     X_train: pd.DataFrame,
     X_val: pd.DataFrame,
@@ -145,10 +123,7 @@ def scale_features(
     return X_train, X_val, X_test, scaler
 
 
-# ------------------------------------------------------------------
 # Class imbalance handling
-# ------------------------------------------------------------------
-
 def handle_imbalance(
     X_train: pd.DataFrame,
     y_train: pd.Series,
@@ -184,10 +159,7 @@ def handle_imbalance(
     )
 
 
-# ------------------------------------------------------------------
 # Feature/target preparation
-# ------------------------------------------------------------------
-
 def prepare_features_and_target(
     df: pd.DataFrame,
     config: Dict[str, Any],
@@ -206,10 +178,7 @@ def prepare_features_and_target(
     return X, y
 
 
-# ------------------------------------------------------------------
 # Saving processed data
-# ------------------------------------------------------------------
-
 def save_processed_data(
     train_df: pd.DataFrame,
     val_df: pd.DataFrame,
@@ -227,10 +196,7 @@ def save_processed_data(
     logger.info(f"Processed datasets saved to {output_dir}")
 
 
-# ------------------------------------------------------------------
-# Small internal helpers (limited, intentional)
-# ------------------------------------------------------------------
-
+# Small internal helpers
 def _log_class_distribution(df: pd.DataFrame, name: str) -> None:
     fraud_ratio = df["Class"].mean()
     logger.info(f"{name} set fraud ratio: {fraud_ratio:.4f}")

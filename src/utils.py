@@ -1,14 +1,3 @@
-"""
-Common utility functions for the fraud detection system.
-
-This module provides helpers for:
-- Configuration loading
-- Logging setup
-- Metrics I/O
-- Plotting evaluation figures
-- Small formatting utilities
-"""
-
 import json
 import logging
 from datetime import datetime
@@ -21,10 +10,7 @@ import seaborn as sns
 import yaml
 
 
-# ------------------------------------------------------------------
 # General utilities
-# ------------------------------------------------------------------
-
 def ensure_dir(path: Path | str) -> None:
     """Create directory if it does not exist."""
     Path(path).mkdir(parents=True, exist_ok=True)
@@ -35,20 +21,14 @@ def format_number(value: float, decimals: int = 4) -> str:
     return f"{value:.{decimals}f}"
 
 
-# ------------------------------------------------------------------
 # Configuration
-# ------------------------------------------------------------------
-
 def load_config(path: str = "config/config.yaml") -> dict:
     """Load YAML configuration file."""
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-# ------------------------------------------------------------------
 # Logging
-# ------------------------------------------------------------------
-
 def setup_logging(
     log_level: str = "INFO",
     log_file: str | None = None,
@@ -73,10 +53,7 @@ def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
 
 
-# ------------------------------------------------------------------
 # Metrics
-# ------------------------------------------------------------------
-
 def save_metrics(metrics: dict, path: str) -> None:
     """Save metrics dictionary as JSON."""
     ensure_dir(Path(path).parent)
@@ -92,10 +69,7 @@ def load_metrics(path: str) -> dict:
         return json.load(f)
 
 
-# ------------------------------------------------------------------
 # Plotting helpers
-# ------------------------------------------------------------------
-
 def _save_figure(fig: plt.Figure, path: str) -> None:
     ensure_dir(Path(path).parent)
     fig.savefig(path, dpi=300, bbox_inches="tight")
@@ -165,20 +139,22 @@ def plot_feature_importance(
     elif hasattr(model, "feature_importance"):
         importances = model.feature_importance(importance_type="gain")
     else:
-        raise ValueError("Model does not expose feature importance attributes or methods")
+        raise ValueError(
+            "Model does not expose feature importance attributes or methods"
+        )
 
     # Sort and get top N
     indices = np.argsort(importances)[-top_n:]
 
     fig, ax = plt.subplots(figsize=(10, 8))
-    ax.barh(range(len(indices)), importances[indices], color='skyblue')
+    ax.barh(range(len(indices)), importances[indices], color="skyblue")
     ax.set_yticks(range(len(indices)))
     ax.set_yticklabels([feature_names[i] for i in indices])
     ax.set_xlabel("Importance (Gain)")
     ax.set_title(title)
-    plt.grid(axis='x', linestyle='--', alpha=0.7)
+    plt.grid(axis="x", linestyle="--", alpha=0.7)
     plt.tight_layout()
 
-    # Assuming _save_figure is a helper in your utils, 
+    # Assuming _save_figure is a helper in your utils,
     # otherwise use: plt.savefig(path); plt.close()
     _save_figure(fig, path)

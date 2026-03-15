@@ -3,58 +3,58 @@ drift_detection:
   check_frequency_hours: 24  # Run drift checks every 24 hours
   reference_window_days: 30  # Use last 30 days as reference
   current_window_days: 7     # Compare with last 7 days
-  
+
 thresholds:
   # Data drift thresholds
   data_drift_score: 0.3           # Dataset-level drift threshold
   feature_drift_score: 0.5        # Individual feature drift threshold
   max_drifted_features_ratio: 0.3 # Max % of features allowed to drift
-  
+
   # Prediction drift thresholds
   prediction_drift_score: 0.2     # Prediction distribution drift
   fraud_rate_change_pct: 50       # Alert if fraud rate changes >50%
-  
+
   # Performance degradation
   performance_degradation_pct: 10 # Alert if metrics drop >10%
   min_f1_threshold: 0.85          # Alert if F1 falls below this
   min_recall_threshold: 0.92      # Alert if recall falls below this
-  
+
 reports:
   save_html: true
   save_json: true
   output_dir: "reports/drift/"
   retention_days: 90  # Keep reports for 90 days
-  
+
 monitoring:
   # Continuous monitoring settings
   enable_continuous_monitoring: true
   monitoring_batch_size: 1000  # Number of predictions to batch for monitoring
-  
+
   # Feature monitoring
   monitor_feature_distribution: true
   monitor_missing_values: true
   monitor_feature_correlations: true
-  
+
   # Target monitoring
   monitor_target_distribution: true
   monitor_class_balance: true
-  
+
 logging:
   level: "INFO"
   log_file: "logs/drift_monitoring.log"
   max_log_size_mb: 50
   backup_count: 3
-  
+
 alerts:
   # When to send alerts
   alert_on_drift: true
   alert_on_performance_drop: true
   alert_on_prediction_anomaly: true
-  
+
   # Alert channels (configured in alert_config.yaml)
   use_email: true
   use_slack: false
-  
+
 # Reference data management
 reference_data:
   auto_update: true
